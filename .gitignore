@@ -1,0 +1,11 @@
+# 依赖
+node_modules/
+# 构建产物
+dist/
+# 隐私数据
+public/private_data.json
+# 日志
+*.log
+# 编辑器缓存
+.vscode/
+.idea/

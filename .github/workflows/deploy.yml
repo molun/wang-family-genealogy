@@ -3,24 +3,31 @@ on:
   push:
     branches: [ main ]
 env:
-  # 强制使用 Node 24，解决弃用警告
+  # 强制所有 Actions 使用 Node 24，彻底消除弃用警告
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      # 升级到支持 Node 24 的最新版本
+      # 升级到支持 Node 24 的最新稳定版
       - uses: actions/checkout@v4.2.2
+      
       - name: 安装Node.js
         uses: actions/setup-node@v4.1.0
         with:
           node-version: 24
+          cache: 'npm'
+      
       - name: 安装依赖
         run: npm install
+      
       - name: 构建静态文件
         run: npm run build
+      
       - name: 部署到GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4.8.0
+        uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist
+          # 可选：开启 cname 配置（如果你有自定义域名）
+          # cname: shturl.cc/jyObF

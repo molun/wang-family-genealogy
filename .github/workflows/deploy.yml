@@ -1,7 +1,7 @@
 name: 部署王氏宗谱网站到GitHub Pages
-on:
+于:
   push:
-    branches: [ main ]
+    分支: [ main ]
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest

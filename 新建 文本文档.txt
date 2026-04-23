@@ -1,0 +1,7 @@
+# 初始化Git仓库
+git init
+git add .
+git commit -m "初始提交：堡则峪王氏宗谱网站"
+git branch -M main
+git remote add origin https://github.com/molun/wang-family-genealogy.git
+git push -u origin main

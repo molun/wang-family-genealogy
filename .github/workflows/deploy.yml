@@ -2,21 +2,25 @@ name: 部署王氏宗谱网站到GitHub Pages
 on:
   push:
     branches: [ main ]
+env:
+  # 强制使用 Node 24，解决弃用警告
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      # 升级到支持 Node 24 的最新版本
+      - uses: actions/checkout@v4.2.2
       - name: 安装Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v4.1.0
         with:
-          node-version: 20
+          node-version: 24
       - name: 安装依赖
         run: npm install
       - name: 构建静态文件
         run: npm run build
       - name: 部署到GitHub Pages
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-gh-pages@v4.8.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./dist

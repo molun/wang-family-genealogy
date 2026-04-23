@@ -1,53 +1,66 @@
 name: 部署王氏宗谱网站到GitHub Pages
 on:
+  # 推送到 main 分支时自动触发部署
   push:
     branches: [ main ]
+  # 允许你在 Actions 页面手动触发部署（可选，方便调试）
+  workflow_dispatch:
 
-# 关键：设置 GITHUB_TOKEN 权限
+# 配置 GITHUB_TOKEN 所需的最低权限（官方推荐）
 permissions:
   contents: read
   pages: write
   id-token: write
 
+# 防止并发部署冲突
 concurrency:
   group: "pages"
   cancel-in-progress: false
 
 jobs:
-  # 构建任务
+  # 任务1：构建网站
   build:
     runs-on: ubuntu-latest
     env:
-      # 强制使用 Node 24
+      # 【关键】强制所有 Actions 使用 Node 24，彻底消除弃用警告
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
     steps:
-      - name: 检出代码
+      - name: 1. 检出代码
+        # 使用最新稳定版，已支持 Node 24
         uses: actions/checkout@v4.2.2
       
-      - name: 设置 Node.js
+      - name: 2. 设置 Node.js 环境
         uses: actions/setup-node@v4.1.0
         with:
+          # 直接使用 Node 24 进行构建
           node-version: '24'
+          # 缓存 npm 依赖，加快后续构建速度
+          cache: 'npm'
       
-      - name: 安装依赖
-        run: npm install
+      - name: 3. 安装项目依赖
+        run: npm ci
+        # 说明：使用 npm ci 而非 npm install，确保依赖版本和 package-lock.json 完全一致，更稳定
       
-      - name: 构建网站
+      - name: 4. 构建静态网站
         run: npm run build
       
-      - name: 上传构建产物
-        uses: actions/upload-pages-artifact@v3
+      - name: 5. 上传构建产物
+        # 使用官方上传组件，已支持 Node 24
+        uses: actions/upload-pages-artifact@v3.0.1
         with:
           path: ./dist
 
-  # 部署任务（使用官方 GitHub Pages 部署器，最稳定）
+  # 任务2：部署到 GitHub Pages
   deploy:
     environment:
       name: github-pages
+      # 这里会自动生成你的网站链接
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
+    # 确保构建完成后再部署
     needs: build
     steps:
       - name: 部署到 GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        # 使用官方部署组件，最稳定，已支持 Node 24
+        uses: actions/deploy-pages@v4.0.5
